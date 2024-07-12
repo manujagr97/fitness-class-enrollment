@@ -1,37 +1,52 @@
 package com.example.fitness;
 
-import com.example.fitness.entity.AppUser;
-import com.example.fitness.repository.AppUserRepository;
+import com.example.fitness.entity.*;
+import com.example.fitness.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 @Component
-public class DataLoader {
+public class DataLoader implements CommandLineRunner {
 
     @Autowired
     private AppUserRepository appUserRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private FitnessClassRepository fitnessClassRepository;
 
-    @Bean
-    CommandLineRunner loadData() {
-        return args -> {
-            if (appUserRepository.count() == 0) {
-                appUserRepository.save(new AppUser("user1", passwordEncoder.encode("password1")));
-                appUserRepository.save(new AppUser("user2", passwordEncoder.encode("password2")));
-                appUserRepository.save(new AppUser("user3", passwordEncoder.encode("password3")));
-                appUserRepository.save(new AppUser("user4", passwordEncoder.encode("password4")));
-                appUserRepository.save(new AppUser("user5", passwordEncoder.encode("password5")));
-                appUserRepository.save(new AppUser("user6", passwordEncoder.encode("password6")));
-                appUserRepository.save(new AppUser("user7", passwordEncoder.encode("password7")));
-                appUserRepository.save(new AppUser("user8", passwordEncoder.encode("password8")));
-                appUserRepository.save(new AppUser("user9", passwordEncoder.encode("password9")));
-                appUserRepository.save(new AppUser("user10", passwordEncoder.encode("password10")));
-            }
-        };
+    @Autowired
+    private AttendanceRepository attendanceRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Override
+    public void run(String... args) throws Exception {
+        AppUser user1 = new AppUser("student1", "password1", "STUDENT");
+        AppUser user2 = new AppUser("student2", "password2", "STUDENT");
+
+        appUserRepository.save(user1);
+        appUserRepository.save(user2);
+
+        FitnessClass class1 = new FitnessClass("Yoga", "A relaxing yoga class", "Instructor1", "Monday 8 AM");
+        FitnessClass class2 = new FitnessClass("Pilates", "A challenging pilates class", "Instructor2", "Wednesday 6 PM");
+
+        fitnessClassRepository.save(class1);
+        fitnessClassRepository.save(class2);
+
+        Attendance attendance1 = new Attendance(user1, class1, "check", new Date(), "Present");
+        Attendance attendance2 = new Attendance(user2, class2, "check", new Date(), "Absent");
+
+        attendanceRepository.save(attendance1);
+        attendanceRepository.save(attendance2);
+
+        Payment payment1 = new Payment(user1, 100.0, "Paid", new Date());
+        Payment payment2 = new Payment(user2, 150.0, "Pending", new Date());
+
+        paymentRepository.save(payment1);
+        paymentRepository.save(payment2);
     }
 }

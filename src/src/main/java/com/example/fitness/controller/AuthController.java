@@ -1,5 +1,6 @@
 package com.example.fitness.controller;
 
+import com.example.fitness.entity.AuthRequest;
 import com.example.fitness.entity.AppUser;
 import com.example.fitness.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +18,18 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public AppUser register(@RequestBody AppUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return appUserRepository.save(user);
+    public String register(@RequestBody AuthRequest authRequest) {
+        AppUser user = new AppUser(authRequest.getUsername(), passwordEncoder.encode(authRequest.getPassword()), "RECEPTIONIST");
+        appUserRepository.save(user);
+        return "User registered successfully";
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestBody AppUser user) {
-        AppUser existingUser = appUserRepository.findByUsername(user.getUsername());
-        if (existingUser != null && passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
-            return "User logged in successfully!";
-        } else {
-            return "Invalid username or password!";
+    public String login(@RequestBody AuthRequest authRequest) {
+        AppUser user = appUserRepository.findByUsername(authRequest.getUsername());
+        if (user != null && passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
+            return "Login successful";
         }
+        return "Invalid username or password";
     }
 }
