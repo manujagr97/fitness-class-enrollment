@@ -32,4 +32,9 @@ public class AuthController {
         }
         return "Invalid username or password";
     }
+
+    @GetMapping("users/{id}")
+    public AppUser getUserById(@PathVariable Long id) {
+        return appUserRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
